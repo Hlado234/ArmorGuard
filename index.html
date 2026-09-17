@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeaponDefense — Система обліку зброї</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #eef1f5;
+            color: #222;
+        }
+
+        header {
+            background: #1f2937;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        header p {
+            margin: 5px 0 0;
+            opacity: 0.8;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .panel {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .search {
+            display: flex;
+            gap: 10px;
+        }
+
+        input, select {
+            padding: 12px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .search input {
+            flex: 1;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        button.all {
+            background: #6b7280;
+        }
+
+        button.all:hover {
+            background: #4b5563;
+        }
+
+        button.delete {
+            background: #dc2626;
+            margin-top: 15px;
+        }
+
+        button.delete:hover {
+            background: #b91c1c;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+
+        .card h2 {
+            color: #1f2937;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 8px;
+            margin-top: 0;
+            font-size: 20px;
+        }
+
+        .card h3 {
+            color: #374151;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .label {
+            color: #777;
+            font-size: 12px;
+        }
+
+        .value {
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: #d1fae5;
+            color: #065f46;
+            font-size: 14px;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .empty {
+            background: #f3f4f6;
+            color: #4b5563;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            .search {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>WeaponDefense</h1>
+    <p>Інформаційна система обліку зброї</p>
+</header>
+
+<div class="container">
+
+    <!-- Панель пошуку -->
+    <div class="panel">
+        <div class="search">
+            <input type="text" id="search" placeholder="Введіть ID або серійний номер...">
+            <button onclick="searchWeapon()">Пошук</button>
+            <button class="all" onclick="showAll()">Показати всі</button>
+        </div>
+    </div>
+
+    <!-- Форма додавання -->
+    <div class="panel">
+        <h3 style="margin-top: 0;">Реєстрація нової одиниці</h3>
+        <form id="add-form" onsubmit="addWeapon(event)">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Тип зброї</label>
+                    <input type="text" id="type" required placeholder="Пістолет / Автомат">
+                </div>
+                <div class="form-group">
+                    <label>Модель</label>
+                    <input type="text" id="model" required placeholder="Glock 17">
+                </div>
+                <div class="form-group">
+                    <label>Серійний номер</label>
+                    <input type="text" id="serial" required placeholder="GL170001">
+                </div>
+                <div class="form-group">
+                    <label>Калібр</label>
+                    <input type="text" id="caliber" required placeholder="9×19 мм">
+                </div>
+                <div class="form-group">
+                    <label>Рік виготовлення</label>
+                    <input type="number" id="year" required placeholder="2022">
+                </div>
+                <div class="form-group">
+                    <label>ТТХ</label>
+                    <input type="text" id="ttx" placeholder="Місткість магазину...">
+                </div>
+                <div class="form-group">
+                    <label>ПІБ отримувача</label>
+                    <input type="text" id="employee" required placeholder="Іванов І.І.">
+                </div>
+                <div class="form-group">
+                    <label>Звання</label>
+                    <input type="text" id="rank" placeholder="Капітан поліції">
+                </div>
+                <div class="form-group">
+                    <label>Посада</label>
+                    <input type="text" id="position" placeholder="Інспектор">
+                </div>
+                <div class="form-group">
+                    <label>Дата видачі</label>
+                    <input type="date" id="issued" required>
+                </div>
+            </div>
+            <button type="submit" style="margin-top: 15px; width: 100%;">Зареєструвати</button>
+        </form>
+    </div>
+
+    <!-- Результати -->
+    <div id="result"></div>
+
+</div>
+
+<script>
+    // Початкові дані
+    let weapons = [
+        {
+            id: 1,
+            type: "Пістолет",
+            model: "Glock 17",
+            caliber: "9×19 мм",
+            serial: "GL170001",
+            year: "2020",
+            ttx: "Місткість магазину — 17 набоїв",
+            employee: "Петренко Олександр Іванович",
+            rank: "Капітан поліції",
+            position: "Старший інспектор",
+            issued: "2026-09-01",
+            returned: "2026-09-01",
+            condition: "Справна",
+            defects: "Відсутні"
+        },
+        {
+            id: 2,
+            type: "Пістолет",
+            model: "ПМ",
+            caliber: "9×18 мм",
+            serial: "PM00002",
+            year: "2018",
+            ttx: "Місткість магазину — 8 набоїв",
+            employee: "Коваленко Андрій Петрович",
+            rank: "Старший лейтенант поліції",
+            position: "Інспектор",
+            issued: "2026-09-02",
+            returned: "2026-09-02",
+            condition: "Справна",
+            defects: "Відсутні"
+        }
+    ];
+
+    // Шаблон картки
+    function createCard(w) {
+        return `
+            <div class="card">
+                <h2>${w.type} ${w.model}</h2>
+                <div class="grid">
+                    <div class="item"><div class="label">ID зброї</div><div class="value">${w.id}</div></div>
+                    <div class="item"><div class="label">Серійний номер</div><div class="value">${w.serial}</div></div>
+                    <div class="item"><div class="label">Калібр</div><div class="value">${w.caliber}</div></div>
+                    <div class="item"><div class="label">Рік виготовлення</div><div class="value">${w.year}</div></div>
+                    <div class="item"><div class="label">ТТХ</div><div class="value">${w.ttx || '—'}</div></div>
+                    <div class="item"><div class="label">Технічний стан</div><div class="value"><span class="status">${w.condition}</span></div></div>
+                </div>
+
+                <h3>Інформація про отримувача</h3>
+                <div class="grid">
+                    <div class="item"><div class="label">ПІБ</div><div class="value">${w.employee}</div></div>
+                    <div class="item"><div class="label">Звання</div><div class="value">${w.rank || '—'}</div></div>
+                    <div class="item"><div class="label">Посада</div><div class="value">${w.position || '—'}</div></div>
+                    <div class="item"><div class="label">Дата видачі</div><div class="value">${w.issued}</div></div>
+                </div>
+
+                <button class="delete" onclick="deleteWeapon(${w.id})">Видалити запис</button>
+            </div>
+        `;
+    }
+
+    function render(data) {
+        const resultContainer = document.getElementById("result");
+        if (!data || data.length === 0) {
+            resultContainer.innerHTML = '<div class="message empty">Записів не знайдено.</div>';
+            return;
+        }
+        resultContainer.innerHTML = Array.isArray(data) 
+            ? data.map(createCard).join("") 
+            : createCard(data);
+    }
+
+    function searchWeapon() {
+        const query = document.getElementById("search").value.trim().toLowerCase();
+        if (!query) {
+            document.getElementById("result").innerHTML = '<div class="message error">Введіть ID або серійний номер.</div>';
+            return;
+        }
+        const found = weapons.find(w => String(w.id) === query || w.serial.toLowerCase() === query);
+        if (!found) {
+            document.getElementById("result").innerHTML = '<div class="message error">Зброю не знайдено.</div>';
+            return;
+        }
+        render(found);
+    }
+
+    function showAll() {
+        render(weapons);
+    }
+
+    function addWeapon(event) {
+        event.preventDefault();
+
+        const newWeapon = {
+            id: weapons.length ? Math.max(...weapons.map(w => w.id)) + 1 : 1,
+            type: document.getElementById("type").value,
+            model: document.getElementById("model").value,
+            serial: document.getElementById("serial").value,
+            caliber: document.getElementById("caliber").value,
+            year: document.getElementById("year").value,
+            ttx: document.getElementById("ttx").value,
+            employee: document.getElementById("employee").value,
+            rank: document.getElementById("rank").value,
+            position: document.getElementById("position").value,
+            issued: document.getElementById("issued").value,
+            condition: "Справна",
+            defects: "Відсутні"
+        };
+
+        weapons.push(newWeapon);
+        document.getElementById("add-form").reset();
+        showAll();
+    }
+
+    function deleteWeapon(id) {
+        if (confirm("Ви впевнені, що хочете видалити цей запис?")) {
+            weapons = weapons.filter(w => w.id !== id);
+            showAll();
+        }
+    }
+
+    // Відображення списку при завантаженні
+    showAll();
+</script>
+
+</body>
+</html>
